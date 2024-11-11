@@ -47,7 +47,8 @@ const Footer = () => {
             Discord
           </a>
         </div>
-        <div class="footer__copyright">Copyright © 2024 Zexin Zou</div></div>
+        <div class="footer__copyright">Copyright © 2024 Zexin Zou</div>
+        </div>
     </footer>
   );
 };

@@ -1,15 +1,18 @@
-import Footer from "./Components/Footer";
-import HomeSearch from "./Components/HomeSearch";
-import Nav from "./Components/Nav";
+import {BrowserRouter as Router,Routes,Route} from 'react-router-dom'
+import Home from './pages/Home';
+import Posts from './pages/Posts';
 
 
 function App() {
   return (
-    <div>
-      <Nav/>
-      <HomeSearch/>
-      <Footer/>
+  <Router>
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/:id" element={<Posts/>}/>
+      </Routes>
     </div>
+  </Router>
   );
 }
 

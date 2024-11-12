@@ -2,8 +2,10 @@ import React from "react";
 import Logo from "../assets/Gray and Black Simple Studio Logo_processed.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
 const Footer = () => {
   return (
+    <section>
     <footer>
         <div className="footer__row">
           <a href="#" className="footer__anchor">
@@ -47,9 +49,10 @@ const Footer = () => {
             Discord
           </a>
         </div>
-        <div class="footer__copyright">Copyright © 2024 Zexin Zou</div>
+        <div className="footer__copyright">Copyright © 2024 Zexin Zou</div>
         </div>
     </footer>
+    </section>
   );
 };
 

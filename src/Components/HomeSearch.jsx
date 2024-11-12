@@ -1,19 +1,6 @@
-import React, { useEffect } from "react";
 import Logo from "../assets/wp8733088.png";
-import BGM from "../assets/bgm.mp3";
 
 const HomeSearch = () => {
-    
-  useEffect(() => {
-    const audio = document.getElementById("bgm");
-    if (audio) {
-      audio.volume = 0.3; // Set volume to 30%
-      audio.play().catch((error) => {
-        console.log("Autoplay was prevented:", error);
-      });
-    }
-  }, []); // Empty dependency array to run only on page load
-
   return (
     <>
       <section className="search-section">
@@ -45,9 +32,6 @@ const HomeSearch = () => {
               <img className="search-img" src={Logo} alt="" />
             </div>
           </div>
-        </div>
-        <div>
-          <audio id="bgm" src={BGM} autoPlay></audio>
         </div>
       </section>
     </>

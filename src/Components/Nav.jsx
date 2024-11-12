@@ -65,7 +65,7 @@ const Nav = () => {
                 />
               </a>
             </li>
-            <li className="nav-link"><a href="/songs" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">Find Featured Songs</a></li>
+            <li className="nav-link"><a href="/featuredsongs" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">Find Featured Songs</a></li>
             <li className="nav-link"><a href="#" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white no-cursor">Log in</a></li>
             <button className="btn_menu cursor-pointer" onClick={openMenu} ><FontAwesomeIcon icon="fa-solid fa-caret-down" /></button>
             <li className="nav-link"><a href="#" onClick={toggleTheme}><FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin /></a></li>

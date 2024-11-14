@@ -91,7 +91,7 @@ footer {
 .dark-theme h4,
 .dark-theme .column-info,
 .dark-theme select,
-.dark-theme #currentPageDisplay,
+.dark-theme .currentPageDisplay,
 .dark-theme .chart-icon,
 .dark-theme .fa-circle-half-stroke,
 .dark-theme .btn_menu {
@@ -714,7 +714,7 @@ select {
 
 /* Hover effect */
 .results-lists:hover {
-    transform: translateY(-5px);
+    transform: translateY(-15px);
 }
 
 /* Responsive adjustments */
@@ -828,3 +828,29 @@ select {
 #nextButton:hover {
     transform: scale(1.3) translateX(10px);
 }
+
+.skeleton-loader {
+    width: 100px; /* Adjust based on the width of your page text */
+    height: 20px; /* Adjust based on your text height */
+    background-color: #ccc;
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+  
+  .skeleton-text {
+    display: inline-block;
+    margin: 0 auto;
+  }
+  
+  @keyframes pulse {
+    0% {
+      background-color: #e0e0e0;
+    }
+    50% {
+      background-color: #f0f0f0;
+    }
+    100% {
+      background-color: #e0e0e0;
+    }
+  }
+  
+  

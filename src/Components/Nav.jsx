@@ -1,43 +1,73 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import BGM from "../assets/bgm.mp3";
 
 const Nav = () => {
   const audioRef = useRef();
+  const location = useLocation();
   const [isPlaying, setIsPlaying] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark theme
+  const [isAudioAllowed, setIsAudioAllowed] = useState(true);
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = 0.5;
       audioRef.current.muted = false; // Unmute the audio
-      audioRef.current.play(); // Start playing music
-      setIsPlaying(true); // Ensure state reflects that music is playing
-      setAnimate(true); // Start animation when audio starts
-    } document.body.classList.add(isDarkMode ? 'dark-theme' : 'light-theme');
+      if (isAudioAllowed) {
+        audioRef.current.play().catch(() => {}); // Start playing music if allowed
+        setIsPlaying(true);
+        setAnimate(true);
+      }
+    }
+    document.body.classList.add(isDarkMode ? 'dark-theme' : 'light-theme');
 
-    // Clean up the theme class when the component is unmounted
     return () => {
       document.body.classList.remove('dark-theme', 'light-theme');
     };
-  }, [isDarkMode]);
+  }, [isDarkMode, isAudioAllowed]);
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const shouldPauseAudio = currentPath === "/featuredsongs" || currentPath === "/searchsongs";
+    
+    if (shouldPauseAudio && isPlaying) {
+      audioRef.current.pause();
+      setAnimate(false);
+      setIsPlaying(false);
+      setIsAudioAllowed(false); // Disallow audio on specific routes
+    } else if (!shouldPauseAudio && !isPlaying) {
+      setIsAudioAllowed(true); // Allow audio on other routes
+    }
+  }, [location.pathname, isPlaying]);
 
   const toggleAudio = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
-        setAnimate(false); // Stop animation when audio stops
-      } else {
-        audioRef.current.play();
-        setAnimate(true); // Start animation when audio starts
+        setAnimate(false);
+      } else if (isAudioAllowed) { // Check if audio is allowed before playing
+        audioRef.current.play().catch(() => {});
+        setAnimate(true);
       }
-      setIsPlaying(!isPlaying); // Toggle the state based on whether it's currently playing
+      setIsPlaying(!isPlaying);
     }
   };
 
+  useEffect(() => {
+    // Check localStorage for a saved theme, defaulting to dark if none is found
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setIsDarkMode(savedTheme === 'dark');
+    document.body.classList.add(savedTheme === 'dark' ? 'dark-theme' : 'light-theme');
+  }, []);
+
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode); // Toggle between dark and light mode
+    const newTheme = !isDarkMode ? 'dark' : 'light';
+    setIsDarkMode(!isDarkMode);
+    document.body.classList.toggle('dark-theme', newTheme === 'dark');
+    document.body.classList.toggle('light-theme', newTheme === 'light');
+    localStorage.setItem('theme', newTheme); // Save current theme to localStorage
   };
 
   function openMenu() {
@@ -94,6 +124,3 @@ const Nav = () => {
 };
 
 export default Nav;
-
-
-

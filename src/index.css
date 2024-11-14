@@ -202,17 +202,17 @@ input:focus {
     mix-blend-mode: difference;
     top: 0;
     left: 0;
-    z-index: 999;
-}
-
-.circle {
-    position: absolute;
-    display: block;
-    width: 26px;
-    height: 26px;
-    border-radius: 20px;
-    background-color: #fff;
-}
+    z-index: 9999999999999999;  
+  }
+  
+  .circle {
+      position: absolute;
+      display: block;
+      width: 26px;
+      height: 26px;
+      border-radius: 20px;
+      background-color: #fff;
+  }
 
 @media (max-width: 480px) {
 

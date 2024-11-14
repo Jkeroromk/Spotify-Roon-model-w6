@@ -1,6 +1,19 @@
+import React, { useState } from "react";
 import Logo from "../assets/wp8733088.png";
+import { useNavigate } from "react-router-dom";
 
 const HomeSearch = () => {
+  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+  const navigate = useNavigate(); // Get the navigate function
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery) {
+      // Navigate to the FeaturedSongs page and pass the search query in the URL
+      navigate(`/searchsongs?search=${searchQuery}`);
+    }
+  };
+
   return (
     <>
       <section className="search-section">
@@ -13,13 +26,15 @@ const HomeSearch = () => {
               Let's decide what type of music for you of the day
             </h3>
             <div className="input-box">
-              <form className="input-submit" id="searchForm">
+              <form className="input-submit" id="searchForm" onSubmit={handleSearchSubmit}>
                 <input
                   type="text"
                   required
                   className="searchInput"
                   id="searchInput"
                   placeholder="Search by Song name, artist, album or title"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)} // Update search query
                 />
                 <div className="btn-search">
                   <button type="submit" className="btn" id="searchButton">
@@ -39,5 +54,7 @@ const HomeSearch = () => {
 };
 
 export default HomeSearch;
+
+
 
 

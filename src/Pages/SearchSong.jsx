@@ -3,14 +3,27 @@ import "../index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import getAccessToken from "../auth";
 import PageButton from "../Components/PageButton";
+import { useLocation } from "react-router-dom"; // Import useLocation
 
-const FeaturedSongs = () => {
+const SearchSongs = () => {
   const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState(false); // Modify loading to control spinner visibility
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalTracks, setTotalTracks] = useState(0);
   const [sortCriteria, setSortCriteria] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+
+  const location = useLocation(); // Get the location object
+
+  // Extract the search query from the URL using URLSearchParams
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get("search");
+    if (query) {
+      setSearchQuery(query); // Set the search query in state
+    }
+  }, [location]); // Re-run this effect when the location changes
 
   // Function to calculate the limit dynamically based on screen size
   const calculateLimit = () => {
@@ -31,39 +44,30 @@ const FeaturedSongs = () => {
     return itemsPerRow * rowCount;
   };
 
-  // Function to fetch the songs based on sorting and pagination
-  const fetchTopHits = async (accessToken, offset = 0) => {
+  // Function to fetch songs based on the search query
+  const fetchSearchResults = async (accessToken, searchQuery, offset = 0) => {
     const limit = calculateLimit(); // Use calculated limit
 
     try {
       const response = await fetch(
-        `https://api.spotify.com/v1/browse/featured-playlists?limit=1`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          searchQuery
+        )}&type=track&limit=${limit}&offset=${offset}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${accessToken}` },
         }
       );
-      if (!response.ok) throw new Error("Failed to fetch featured playlist");
+      if (!response.ok) throw new Error("Failed to fetch search results");
       const data = await response.json();
-      const playlistId = data.playlists.items[0].id;
+      const tracks = data.tracks.items;
+      const totalTracks = data.tracks.total;
 
-      const tracksResponse = await fetch(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      if (!tracksResponse.ok) throw new Error("Failed to fetch top hits");
-      const tracksData = await tracksResponse.json();
-      const allTracks = tracksData.items.map((item) => item.track);
-      const totalTracks = tracksData.total;
-
-      if (!allTracks.length) throw new Error("No songs retrieved");
-      return { songs: allTracks, total: totalTracks };
+      if (!tracks.length) throw new Error("No songs found");
+      return { songs: tracks, total: totalTracks };
     } catch (error) {
-      console.error("Error fetching top hits:", error);
-      setError("An error occurred while fetching featured songs.");
+      console.error("Error fetching search results:", error);
+      setError("An error occurred while fetching songs.");
       return { songs: [], total: 0 };
     }
   };
@@ -93,6 +97,8 @@ const FeaturedSongs = () => {
   // Fetch songs when the component mounts or when sort criteria/page changes
   useEffect(() => {
     const getSongs = async () => {
+      if (!searchQuery) return; // Avoid making API requests if no search query
+
       setLoading(true); // Show the spinner
 
       // Delay the results to simulate loading for 1 second
@@ -100,7 +106,11 @@ const FeaturedSongs = () => {
         try {
           const accessToken = await getAccessToken();
           const offset = (currentPage - 1) * calculateLimit();
-          const { songs, total } = await fetchTopHits(accessToken, offset);
+          const { songs, total } = await fetchSearchResults(
+            accessToken,
+            searchQuery,
+            offset
+          );
 
           // Sort songs based on selected criteria
           const sortedSongs = sortSongs(songs, sortCriteria);
@@ -126,7 +136,7 @@ const FeaturedSongs = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [currentPage, sortCriteria]);
+  }, [currentPage, sortCriteria, searchQuery]); // Added searchQuery as a dependency
 
   // Handle page navigation
   const handleNextPage = () => {
@@ -150,7 +160,9 @@ const FeaturedSongs = () => {
         <div className="songs-container">
           <div className="songs-row">
             <h2 className="songs-title">
-              <span id="result-type">{"Top Featured Songs"}</span>
+              <span id="result-type">
+                {searchQuery && `Here's your Search Results for "${searchQuery}"`}
+              </span>
             </h2>
             <div className="songs-title-wrapper">
               <div className="title-and-filter">
@@ -233,4 +245,4 @@ const FeaturedSongs = () => {
   );
 };
 
-export default FeaturedSongs;
+export default SearchSongs;

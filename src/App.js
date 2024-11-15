@@ -9,6 +9,7 @@ import Login from "./Pages/Login";
 import EmptyBody from "./Components/User";
 
 
+
 function App() {
   return (
     <Router>
@@ -20,6 +21,7 @@ function App() {
           <Route path="/featuredsongs" element={<FeaturedSongs />} />
           <Route path="/searchsongs" element={<SearchSongs />} />
           <Route path="/Log-in" element={<Login/>} />
+          {/* <Route path="/Song-info" element={<Songinfo/>} /> */}
         </Routes>
         <Footer />
       </div>

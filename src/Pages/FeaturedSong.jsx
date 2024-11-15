@@ -3,6 +3,7 @@ import "../index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import getAccessToken from "../auth";
 import PageButton from "../Components/PageButton";
+import { useNavigate } from "react-router-dom";
 
 const FeaturedSongs = () => {
   const [songs, setSongs] = useState([]);
@@ -11,6 +12,11 @@ const FeaturedSongs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalTracks, setTotalTracks] = useState(0);
   const [sortCriteria, setSortCriteria] = useState("");
+  const navigate = useNavigate();
+
+  const handleSongClick = (song) => {
+    navigate("/song-info", { state: { song } }); // Pass song data to the next page
+  };
 
   // Function to calculate the limit dynamically based on screen size
   const calculateLimit = () => {
@@ -191,7 +197,13 @@ const FeaturedSongs = () => {
                       <div className="results-lists-wrapper">
                         <img
                           src={song.album.images[0].url}
+                          alt={`Album cover of ${
+                            song.album.name
+                          } by ${song.artists
+                            .map((artist) => artist.name)
+                            .join(", ")}`}
                           className="songs-img"
+                          onClick={() => handleSongClick(song)}
                         />
                       </div>
                       <div className="column-info column-title">

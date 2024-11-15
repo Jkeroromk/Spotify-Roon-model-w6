@@ -15,7 +15,7 @@ a {
     text-decoration: none;
     color: #242424;
     font-weight: 500;
-    /* cursor: none; */
+    cursor: none;
 }
 
 p {
@@ -34,8 +34,11 @@ h1 {
 
 html {
     scroll-behavior: smooth;
-    /* cursor: none */
-    height: 100%
+    cursor: none;
+}
+
+body{
+    min-height: 60vh
 }
 
 section,
@@ -94,7 +97,8 @@ footer {
 .dark-theme .currentPageDisplay,
 .dark-theme .chart-icon,
 .dark-theme .fa-circle-half-stroke,
-.dark-theme .btn_menu {
+.dark-theme .btn_menu,
+.dark-theme .form-label {
     color: white;
 }
 
@@ -216,10 +220,10 @@ input:focus {
 
 @media (max-width: 480px) {
 
-    .circle,
+    /* .circle,
     .cursor {
         display: none !important;
-    }
+    } */
 }
 
 img {
@@ -429,8 +433,8 @@ nav {
     flex-direction: column;
     position: relative;
     padding: 60px 32px 10px 32px;
+    text-align: center
 }
-
 
 
 .input-box,
@@ -853,4 +857,89 @@ select {
     }
   }
   
+  
+  /* USER LOG IN AND SIGN IN  PAGE */
+
+  .user-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .user-row {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .user-title {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .user-subtitle {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .user-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+  }
+  
+  .form-label {
+    margin: 10px 0 5px;
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 99px;
+    font-size: 1rem;
+    justify-content: center;
+    text-align: center
+  }
+
+  .submit-button {
+    width: 20%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 99px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    justify-items: center;
+    align-items: center;
+  }
+  
+  .search-container{
+    min-height: 65vh;
+  }
+  
+  .submit-button:hover {
+    background-color: #242424;
+    color:#e0e0e0
+  }
+  
+  .toggle-password-button{
+    border: none;
+  }
+
+
+  .input-container {
+    position: relative;
+    width: 100%;
+  }
+
   

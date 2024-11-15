@@ -11,6 +11,7 @@ const MouseTrail = () => {
     circles.forEach(function (circle) {
       circle.x = 0;
       circle.y = 0;
+      circle.style.backgroundColor = "white";
     });
 
     // Update mouse position coordinates
@@ -25,42 +26,28 @@ const MouseTrail = () => {
       let x = coords.x;
       let y = coords.y;
 
-    
-      const circleRadius = 10; 
-      const offsetX = circleRadius; 
-      const offsetY = circleRadius; 
-
-      // Update the cursor position
-      if (cursor) {
-        cursor.style.top = `${y - offsetY}px`; 
-        cursor.style.left = `${x - offsetX}px`; 
-      }
+      cursor.style.top = x;
+      cursor.style.left = y;
+      
 
       circles.forEach(function (circle, index) {
-        const nextCircle = circles[index + 1] || circles[0];
+    circle.style.left = x - 12 + "px";
+    circle.style.top = y - 12 + "px";
 
-        // Calculate distance to the next circle (to create the trail effect)
-        const distanceX = nextCircle.x - x;
-        const distanceY = nextCircle.y - y;
+    circle.style.scale = (circles.length - index) / circles.length;
 
-        // Apply a trailing effect by easing the circle's movement
-        x += distanceX * 0.3;
-        y += distanceY * 0.3;
+    circle.x = x;
+    circle.y = y;
 
-        // Update the circle's position
-        circle.style.left = `${x - offsetX}px`; // Adjust by full radius
-        circle.style.top = `${y - offsetY}px`; // Adjust by full radius
-        circle.style.transform = `scale(${(circles.length - index) / circles.length})`;
+    const nextCircle = circles[index + 1] || circles[0];
+    x += (nextCircle.x - x) * 0.3;
+    y += (nextCircle.y - y) * 0.3;
+  });
 
-        // Update the circle's position for the next frame
-        circle.x = x;
-        circle.y = y;
-      });
+  requestAnimationFrame(animateCircles);
+}
 
-      requestAnimationFrame(animateCircles);
-    }
-
-    animateCircles();
+animateCircles();
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);

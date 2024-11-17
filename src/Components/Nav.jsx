@@ -107,13 +107,13 @@ const Nav = () => {
           </figure>
           <ul className="nav-links-list">
             <li className="nav-link">
-              <a href="#" onClick={toggleAudio}>
+              <button onClick={toggleAudio} className="chart-icon-btn">
                 <FontAwesomeIcon
                   icon="fa-solid fa-chart-simple"
                   className="chart-icon"
                   beatFade={animate}
                 />
-              </a>
+              </button>
             </li>
             <li className="nav-link"><a href="/featuredsongs" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">Find Featured Songs</a></li>
             {isLoggedIn ? (
@@ -137,7 +137,7 @@ const Nav = () => {
               </li>
             )}
             <button className="btn_menu cursor-pointer" onClick={openMenu}><FontAwesomeIcon icon="fa-solid fa-caret-down" /></button>
-            <li className="nav-link"><a href="#" onClick={toggleTheme}><FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin /></a></li>
+            <li className="nav-link"><button onClick={toggleTheme} className="theme-btn" ><FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin /></button></li>
           </ul>
         </nav>
         <div>

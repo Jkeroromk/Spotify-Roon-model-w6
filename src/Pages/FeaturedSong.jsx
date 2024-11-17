@@ -185,7 +185,7 @@ const FeaturedSongs = () => {
                 <div id="songs-loading">
                   <FontAwesomeIcon
                     icon="fa-solid fa-hourglass-half"
-                    className="fa-solid fa-hourglass-half"
+                    className="fa-solid fa-hourglass-half songs-loading-spinner"
                   />
                 </div>
               ) : error ? (

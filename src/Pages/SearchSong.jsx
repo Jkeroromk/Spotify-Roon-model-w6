@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import getAccessToken from "../auth";
 import PageButton from "../Components/PageButton";
 import { useLocation } from "react-router-dom"; // Import useLocation
+import { useNavigate } from "react-router-dom";
+
 
 const SearchSongs = () => {
   const [songs, setSongs] = useState([]);
@@ -13,8 +15,12 @@ const SearchSongs = () => {
   const [totalTracks, setTotalTracks] = useState(0);
   const [sortCriteria, setSortCriteria] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
-
   const location = useLocation(); // Get the location object
+  const navigate = useNavigate();
+
+  const handleSongClick = (song) => {
+    navigate("/song-info", { state: { song } }); // Pass song data to the next page
+  };
 
   // Extract the search query from the URL using URLSearchParams
   useEffect(() => {
@@ -204,6 +210,7 @@ const SearchSongs = () => {
                         <img
                           src={song.album.images[0].url}
                           className="songs-img"
+                          onClick={() => handleSongClick(song)}
                         />
                       </div>
                       <div className="column-info column-title">

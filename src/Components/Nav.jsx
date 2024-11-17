@@ -155,7 +155,7 @@ const Nav = () => {
               {isLoggedIn ? (
                 <>
                   <li className="menu_list"><a href="/myplaylist" className="menu_link" onClick={CloseMenu}>My Playlist</a></li>
-                  <li className="menu_list"><button onClick={handleLogout} className="menu_link">Log Out</button></li>
+                  <li className="menu_list"><button onClick={handleLogout} className="menu_link log-out">Log Out</button></li>
                 </>
               ) : (
                 <li className="menu_list"><a href="/log-in" className="menu_link" onClick={CloseMenu}>Login</a></li>

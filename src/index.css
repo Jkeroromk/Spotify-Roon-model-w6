@@ -97,12 +97,12 @@ footer {
 .dark-theme .btn_menu,
 .dark-theme .form-label,
 .dark-theme .toggle-password-button,
-.dark-theme .toggle-signup-button {
+.dark-theme .toggle-signup-button,
+.dark-theme .song-info-back {
   color: white;
 }
 
-.dark-theme .fa-arrow-right,
-.dark-theme .fa-arrow-left {
+.dark-theme .page-btn {
   color: #242424;
 }
 
@@ -982,4 +982,60 @@ select {
   .log-out{
     background:none;
     border: none;
+}
+
+.song-info-header{
+  display: flex;
+  align-items: center;
+  padding-top: 16px;
+  background: none;
+  border: none;
+}
+
+.song-info-back{
+  margin-right: 8px;
+  margin-left: 40px;
+  background: none;
+  border: none;
+}
+
+.song-info-recommend{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.song-info-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.song-info-left-row {
+  margin-right: 20px;
+}
+
+.song-info-img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.song-info-right-row {
+  max-width: 500px;
+}
+
+.song-info-right-row h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.song-info-right-row p {
+  font-size: 18px;
+}
+
+audio {
+  margin-top: 20px;
 }

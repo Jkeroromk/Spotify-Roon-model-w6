@@ -6,7 +6,8 @@ import FeaturedSongs from "./Pages/FeaturedSong";
 import SearchSongs from "./Pages/SearchSong";
 import MouseTrail from "./Components/MouseTrail"; // Import MouseTrail
 import Login from "./Pages/Login";
-import EmptyBody from "./Components/User";
+import Songinfo from "./Pages/Songinfo";
+
 
 
 
@@ -21,7 +22,7 @@ function App() {
           <Route path="/featuredsongs" element={<FeaturedSongs />} />
           <Route path="/searchsongs" element={<SearchSongs />} />
           <Route path="/Log-in" element={<Login/>} />
-          {/* <Route path="/Song-info" element={<Songinfo/>} /> */}
+          <Route path="/song-info" element={<Songinfo/>} />
         </Routes>
         <Footer />
       </div>

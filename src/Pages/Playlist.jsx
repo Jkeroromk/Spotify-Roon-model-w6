@@ -15,7 +15,7 @@ const Playlist = ({ songs = [] }) => {
         <div className="sepre"></div>
         <div>
           {songs.length === 0 ? (
-            <p>No songs in the playlist yet.</p>
+            <h5>No songs in the playlist yet.</h5>
           ) : (
             <ul>
               {songs.map((song) => (

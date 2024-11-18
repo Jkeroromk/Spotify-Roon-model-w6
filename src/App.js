@@ -11,10 +11,7 @@ import Songinfo from "./Pages/Songinfo";
 import Playlist from "./Pages/Playlist";
 
 function App() {
-  // Move playlist state here to manage it globally
   const [playlist, setPlaylist] = useState([]);
-
-  // Function to add or remove songs from the playlist
   const handleAddOrRemoveFromPlaylist = (song) => {
     setPlaylist((prevPlaylist) =>
       prevPlaylist.some((item) => item.id === song.id)

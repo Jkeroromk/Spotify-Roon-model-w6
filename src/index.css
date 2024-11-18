@@ -100,7 +100,9 @@ footer {
 .dark-theme .toggle-password-button,
 .dark-theme .toggle-signup-button,
 .dark-theme .song-info-back,
-.dark-theme .songs-loading-spinner {
+.dark-theme .songs-loading-spinner,
+.dark-theme .check-btn,
+.dark-theme .playlist-title{
   color: white;
 }
 
@@ -407,6 +409,10 @@ nav {
     display: block;
     margin-left: 20px;
   }
+}
+
+.searchInput{
+  text-align: center;
 }
 
 .search-text {
@@ -1166,19 +1172,19 @@ audio{
 }
 
 .check-mark{
-  margin-top: 15px;
-  margin-left: 12px;
+  margin-top: 12px;
+  margin-left: 25px;
   font-size: 20px;
   transform: scale(1); /* Set initial scale */
   transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth scaling */
 }
 
 .check-mark:hover{
-  transform: scale(2); /* Smoothly scale up */
+  transform: scale(1.8); /* Smoothly scale up */
 }
 
 .check-btn {
-  padding: 10px;
+  scale: 1.3;
   cursor: pointer;
 }
 

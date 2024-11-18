@@ -9,21 +9,23 @@ const Nav = () => {
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true); // Default to dark theme
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [isAudioAllowed, setIsAudioAllowed] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check login state from localStorage on initial mount and on any changes to localStorage
+  // Initialize states from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setIsDarkMode(savedTheme === "dark");
     document.body.classList.add(savedTheme === "dark" ? "dark-theme" : "light-theme");
 
     const loggedIn = localStorage.getItem("loggedIn") === "true";
-    const guestLoggedIn = localStorage.getItem("guestLoggedIn") === "true"; // Check for guest login
-    setIsLoggedIn(loggedIn || guestLoggedIn); // Update state based on both flags
+    const guestLoggedIn = localStorage.getItem("guestLoggedIn") === "true";
+    setIsLoggedIn(loggedIn || guestLoggedIn);
+  }, []);
 
-    // Listen for changes in localStorage to update the login state
+  // Handle changes in localStorage to update login state
+  useEffect(() => {
     const handleStorageChange = () => {
       const loggedIn = localStorage.getItem("loggedIn") === "true";
       const guestLoggedIn = localStorage.getItem("guestLoggedIn") === "true";
@@ -31,18 +33,17 @@ const Nav = () => {
     };
 
     window.addEventListener("storage", handleStorageChange);
-
     return () => {
-      document.body.classList.remove("dark-theme", "light-theme");
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []); // Empty dependency array to only run on mount
+  }, []);
 
-  // Listen for changes to location (for updating audio and theme)
+  // Manage audio playback
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = 0.5;
-      audioRef.current.muted = false; // Unmute the audio
+      audioRef.current.muted = false;
+
       if (isAudioAllowed) {
         audioRef.current.play().catch(() => {});
         setIsPlaying(true);
@@ -53,15 +54,20 @@ const Nav = () => {
 
   useEffect(() => {
     const currentPath = location.pathname;
-    const shouldPauseAudio = currentPath === "/featuredsongs" || currentPath === "/searchsongs" || currentPath === "/log-in" || currentPath === "/song-info";
+    const shouldPauseAudio =
+      currentPath === "/featuredsongs" ||
+      currentPath === "/searchsongs" ||
+      currentPath === "/log-in" ||
+      currentPath === "/song-info" ||
+      currentPath === "/myplaylist";
 
     if (shouldPauseAudio && isPlaying) {
       audioRef.current.pause();
       setAnimate(false);
       setIsPlaying(false);
-      setIsAudioAllowed(false); // Disallow audio on specific routes
+      setIsAudioAllowed(false);
     } else if (!shouldPauseAudio && !isPlaying) {
-      setIsAudioAllowed(true); // Allow audio on other routes
+      setIsAudioAllowed(true);
     }
   }, [location.pathname, isPlaying]);
 
@@ -79,41 +85,25 @@ const Nav = () => {
   };
 
   const toggleTheme = () => {
-    const newTheme = isDarkMode ? 'light' : 'dark';
+    const newTheme = isDarkMode ? "light" : "dark";
     setIsDarkMode(!isDarkMode);
-    document.body.classList.remove('dark-theme', 'light-theme');
-    document.body.classList.add(newTheme === 'dark' ? 'dark-theme' : 'light-theme');
-    localStorage.setItem('theme', newTheme); // Save current theme to localStorage
+    document.body.classList.remove("dark-theme", "light-theme");
+    document.body.classList.add(newTheme === "dark" ? "dark-theme" : "light-theme");
+    localStorage.setItem("theme", newTheme);
   };
 
   const handleLogout = () => {
-    localStorage.setItem("loggedIn", "false"); // Set loggedIn flag to false
-    localStorage.setItem("guestLoggedIn", "false"); // Set guestLoggedIn flag to false
-    setIsLoggedIn(false); // Update the state to reflect logged out status
-    navigate("/"); // Redirect to login page
-  };
-
-  const handleGuestLogin = () => {
-    const guestCredentials = {
-      email: "123@gmail.com",
-      password: "123456",
-    };
-
-    console.log("Logging in as guest with:", guestCredentials);
-    alert("You are now logged in as a guest!");
-
-    // Set guest login flag in localStorage
-    localStorage.setItem("guestLoggedIn", "true");
-    localStorage.setItem("loggedIn", "false"); // Optionally reset loggedIn flag to false for regular users
-    navigate("/"); // Redirect to home page after guest login
-    window.location.reload(); // Ensure proper state update after reload
+    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("guestLoggedIn");
+    setIsLoggedIn(false);
+    navigate("/log-in");
   };
 
   function openMenu() {
     document.body.classList.add("menu--open");
   }
 
-  function CloseMenu() {
+  function closeMenu() {
     document.body.classList.remove("menu--open");
   }
 
@@ -121,7 +111,9 @@ const Nav = () => {
     <section id="Landing-page">
       <nav>
         <figure>
-          <a href="/"><FontAwesomeIcon icon="fa-brands fa-spotify" className="spotify-logo" /></a>
+          <a href="/">
+            <FontAwesomeIcon icon="fa-brands fa-spotify" className="spotify-logo" />
+          </a>
         </figure>
         <ul className="nav-links-list">
           <li className="nav-link">
@@ -133,32 +125,51 @@ const Nav = () => {
               />
             </button>
           </li>
-          <li className="nav-link"><a href="/featuredsongs" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">Find Featured Songs</a></li>
+          <li className="nav-link">
+            <a
+              href="/featuredsongs"
+              className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white"
+            >
+              Find Featured Songs
+            </a>
+          </li>
           {isLoggedIn ? (
             <>
               <li className="nav-link">
-                <a href="/myplaylist" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">
+                <a
+                  href="/myplaylist"
+                  className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white"
+                >
                   My Playlist
                 </a>
               </li>
               <li className="nav-link">
-                <button onClick={handleLogout} className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white log-out">
+                <button
+                  onClick={handleLogout}
+                  className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white log-out"
+                >
                   Log Out
                 </button>
               </li>
             </>
           ) : (
-            <>
-              <li className="nav-link">
-                <a href="/log-in" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">
-                  Log in
-                </a>
-              </li>
-              {/* Add the Guest Login button */}
-            </>
+            <li className="nav-link">
+              <a
+                href="/log-in"
+                className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white"
+              >
+                Log in
+              </a>
+            </li>
           )}
-          <button className="btn_menu cursor-pointer" onClick={openMenu}><FontAwesomeIcon icon="fa-solid fa-caret-down" /></button>
-          <li className="nav-link"><button onClick={toggleTheme} className="theme-btn" ><FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin /></button></li>
+          <button className="btn_menu cursor-pointer" onClick={openMenu}>
+            <FontAwesomeIcon icon="fa-solid fa-caret-down" />
+          </button>
+          <li className="nav-link">
+            <button onClick={toggleTheme} className="theme-btn">
+              <FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin />
+            </button>
+          </li>
         </ul>
       </nav>
       <div>
@@ -166,24 +177,64 @@ const Nav = () => {
       </div>
       <div className="menu_backdrop">
         <div className="menu_backdrop-container">
-          <button className="btn_menu btn_menu--close" onClick={CloseMenu}>
+          <button className="btn_menu btn_menu--close" onClick={closeMenu}>
             <FontAwesomeIcon icon="fa-solid fa-times" />
           </button>
           <ul className="menu_links">
-            <li className="menu_list"><a href="https://jkeroromk.github.io/Advance-portfolio/" className="menu_link" onClick={CloseMenu} >About</a></li>
-            <li className="menu_list"><a href="/featuredsongs" className="menu_link" onClick={CloseMenu}>Songs</a></li>
-            <li className="menu_list"><a href="https://jkeroromk.github.io/Advance-portfolio/" className="menu_link no-cursor" onClick={CloseMenu} >Contact</a></li>
+            <li className="menu_list">
+              <a
+                href="https://jkeroromk.github.io/Advance-portfolio/"
+                className="menu_link"
+                onClick={closeMenu}
+              >
+                About
+              </a>
+            </li>
+            <li className="menu_list">
+              <a
+                href="/featuredsongs"
+                className="menu_link"
+                onClick={closeMenu}
+              >
+                Songs
+              </a>
+            </li>
+            <li className="menu_list">
+              <a
+                href="https://jkeroromk.github.io/Advance-portfolio/"
+                className="menu_link no-cursor"
+                onClick={closeMenu}
+              >
+                Contact
+              </a>
+            </li>
             {isLoggedIn ? (
               <>
-                <li className="menu_list"><a href="/myplaylist" className="menu_link" onClick={CloseMenu}>My Playlist</a></li>
-                <li className="menu_list"><button onClick={handleLogout} className="menu_link log-out">Log Out</button></li>
+                <li className="menu_list">
+                  <a
+                    href="/myplaylist"
+                    className="menu_link"
+                    onClick={closeMenu}
+                  >
+                    My Playlist
+                  </a>
+                </li>
+                <li className="menu_list">
+                  <button
+                    onClick={handleLogout}
+                    className="menu_link log-out"
+                  >
+                    Log Out
+                  </button>
+                </li>
               </>
             ) : (
-              <>
-                <li className="menu_list"><a href="/log-in" className="menu_link" onClick={CloseMenu}>Login</a></li>
-              </>
+              <li className="menu_list">
+                <a href="/log-in" className="menu_link" onClick={closeMenu}>
+                  Login
+                </a>
+              </li>
             )}
-            <li className="menu_list"><a href="#" className="menu_link no-cursor menu_signup" onClick={CloseMenu}>Sign Up</a></li>
           </ul>
         </div>
       </div>
@@ -192,3 +243,4 @@ const Nav = () => {
 };
 
 export default Nav;
+

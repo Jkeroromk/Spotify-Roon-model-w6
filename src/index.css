@@ -951,6 +951,7 @@ select {
   margin: 0;
   line-height: 1;
   text-align: center;
+  margin-bottom: 10px;
 }
 
 .signup-section{
@@ -982,7 +983,8 @@ select {
   .login-btn,
   .log-out,
   .theme-btn,
-  .chart-icon-btn{
+  .chart-icon-btn,
+  .check-btn{
     background:none;
     border: none;
 }
@@ -1055,8 +1057,11 @@ select {
 }
 
 .song-info-right-row h2 {
-  font-size: 28px;
-  margin: 20px 0px;
+  display: flex;
+  font-size: 26px;
+  margin: 20px 40px;
+  justify-content: center;
+  align-items: center;
 }
 
 .song-info-right-row h4 {
@@ -1146,4 +1151,91 @@ audio{
   100% {
     transform: translateX(-100%); 
   }
+}
+
+.song-info-user-action{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-preview{
+  display: flex;
+  padding-top: 15px;
+  align-items: center;
+}
+
+.check-mark{
+  margin-top: 15px;
+  margin-left: 12px;
+  font-size: 20px;
+  transform: scale(1); /* Set initial scale */
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth scaling */
+}
+
+.check-mark:hover{
+  transform: scale(2); /* Smoothly scale up */
+}
+
+.check-btn {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.check-btn.btn-green {
+  color: green;
+  
+}
+
+.check-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.prompt-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: fadeInOut 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+
+
+.playlist-info{
+  display: flex;
+  flex-direction: column;
+}
+
+.playlist-title,
+.playlist-duration{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
 }

@@ -55,7 +55,8 @@ const User = () => {
       alert("Login Successful!");
       localStorage.setItem("loggedIn", "true"); // Set loggedIn flag in localStorage
 
-      navigate("/"); // Redirect to the home page
+      navigate("/");
+      window.location.reload(); // Redirect to the home page
     } catch (error) {
       setLoading(false);
 
@@ -74,12 +75,18 @@ const User = () => {
       email: "123@gmail.com",
       password: "123456",
     };
-
+  
+    // Set the loggedIn flag in localStorage
+    localStorage.setItem("loggedIn", "true"); 
+    localStorage.setItem("userType", "guest"); // Optional: Store user type as guest
+  
     console.log("Logging in as guest with:", guestCredentials);
     alert("You are now logged in as a guest!");
+  
     navigate("/"); // Redirect to home page after guest login
     window.location.reload();
   };
+  
 
   return (
     <>
@@ -148,7 +155,6 @@ const User = () => {
                   ? "Don't have an account? Sign Up"
                   : "Already have an account? Log In"}
               </button>
-
               <div className="guest-btn">
                 {!isLogin && (
                   <button

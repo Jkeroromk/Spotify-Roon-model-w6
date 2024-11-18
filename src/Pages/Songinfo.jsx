@@ -5,21 +5,24 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import getAccessToken from "../auth";
 import axios from "axios";
 
-const Songinfo = () => {
+const Songinfo = ({ song: propSong, playlist, onAddOrRemoveFromPlaylist }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { song } = location.state || {};
+  
+  // Avoid redeclaring `song` by renaming it as `fetchedSong`
+  const { song: fetchedSong } = location.state || {};
+
+  // Use `propSong` (from props) or `fetchedSong` (from location.state)
+  const song = propSong || fetchedSong;
 
   const [recommendedSongs, setRecommendedSongs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isSongClicked, setIsSongClicked] = useState(false);
+  const [promptMessage, setPromptMessage] = useState(""); // For the prompt message
 
   // Function to calculate the limit based on screen size
   const calculateLimit = () => {
     const screenWidth = window.innerWidth;
-    const itemHeight = 200; // Approximate item height (including gap)
-    const itemWidth = 250; // Approximate item width
-  
+
     // Calculate items per row based on screen width
     const itemsPerRow =
       screenWidth > 1200
@@ -29,14 +32,13 @@ const Songinfo = () => {
         : screenWidth > 768
         ? 3
         : 2;
-  
+
     // Maximum of 2 rows
     const maxRows = 2;
-  
+
     // Total items to fetch
     return itemsPerRow * maxRows;
   };
-  
 
   useEffect(() => {
     if (!song) return;
@@ -56,18 +58,23 @@ const Songinfo = () => {
         const limit = calculateLimit();
 
         // Fetch recommended songs using the access token
-        const response = await axios.get("https://api.spotify.com/v1/recommendations", {
-          params: {
-            seed_tracks: song.id,
-            limit, // Use the calculated limit
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "https://api.spotify.com/v1/recommendations",
+          {
+            params: {
+              seed_tracks: song.id,
+              limit, // Use the calculated limit
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         // Filter out the current song from the recommended songs
-        const filteredSongs = response.data.tracks.filter((track) => track.id !== song.id);
+        const filteredSongs = response.data.tracks.filter(
+          (track) => track.id !== song.id
+        );
         setRecommendedSongs(filteredSongs);
         setLoading(false);
       } catch (error) {
@@ -83,13 +90,21 @@ const Songinfo = () => {
     navigate(-1);
   };
 
-  const handleRecommendationClick = (selectedSong) => {
-    setIsSongClicked(true);
-
+  const handleAddOrRemoveFromPlaylist = () => {
+    // Toggle the song in the playlist
+    onAddOrRemoveFromPlaylist(song);
+  
+    // Show a prompt message after adding/removing
+    const message = playlist.some((item) => item.id === song.id)
+      ? "Added the song to the playlist"
+      : "Removed the song from the playlist";
+  
+    setPromptMessage(message);
+  
+    // Clear the prompt message after 2 seconds
     setTimeout(() => {
-      navigate("/song-info", { state: { song: selectedSong } });
-      setIsSongClicked(false);
-    }, 1000);
+      setPromptMessage("");
+    }, 2000);
   };
 
   if (!song) {
@@ -104,85 +119,94 @@ const Songinfo = () => {
 
   return (
     <section className="song-info-section">
-      {isSongClicked && (
-        <div className="spinner-container">
-          <div id="songs-loading">
-            <FontAwesomeIcon icon="fa-solid fa-hourglass-half" className="songs-loading-spinner" />
-          </div>
+      {promptMessage && (
+        <div className="prompt-message">
+          <p>{promptMessage}</p>
         </div>
       )}
 
-      {!isSongClicked && (
-        <>
-          <div className="song-info-header">
-            <button onClick={handleBackClick} className="song-info-back">
-              <FontAwesomeIcon icon={faArrowLeft} />
-              <h3>Back</h3>
+      <div className="song-info-header">
+        <button onClick={handleBackClick} className="song-info-back">
+          <FontAwesomeIcon icon={faArrowLeft} />
+          <h3>Back</h3>
+        </button>
+      </div>
+
+      <div className="song-info-container">
+        <div className="song-info-left-row">
+          <img
+            src={album.images[0]?.url}
+            alt={`Album cover of ${album.name}`}
+            className="song-info-img"
+          />
+        </div>
+
+        <div className="song-info-right-row">
+          <h2>{name}</h2>
+          <h4 className="artist">{artists[0]?.name}</h4>
+          <h4>Album: {album.name}</h4>
+          <h4>Duration: {formattedDuration}</h4>
+
+          <div className="song-info-user-action">
+            {preview_url ? (
+              <audio controls className="audio-player">
+                <source src={preview_url} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            ) : (
+              <h3 className="no-preview">No preview available</h3>
+            )}
+
+            <button
+              className={`check-btn ${playlist.some((item) => item.id === song.id) ? "btn-green" : ""}`}
+              onClick={handleAddOrRemoveFromPlaylist}
+            >
+              <FontAwesomeIcon
+                icon="fa-solid fa-square-check"
+                className="check-mark"
+              />
             </button>
           </div>
+        </div>
+      </div>
 
-          <div className="song-info-container">
-            <div className="song-info-left-row">
-              <img
-                src={album.images[0]?.url}
-                alt={`Album cover of ${album.name}`}
-                className="song-info-img"
+      <div className="sepre"></div>
+
+      <div className="song-info-recommend">
+        <h2>Songs You Might Like</h2>
+        <div className="recommended-songs">
+          {loading ? (
+            <div id="songs-loading">
+              <FontAwesomeIcon
+                icon="fa-solid fa-hourglass-half"
+                className="fa-solid fa-hourglass-half songs-loading-spinner"
               />
             </div>
-
-            <div className="song-info-right-row">
-              <h2>{name}</h2>
-              <h4 className="artist">{artists[0]?.name}</h4>
-              <h4>Album: {album.name}</h4>
-              <h4>Duration: {formattedDuration}</h4>
-
-              {preview_url ? (
-                <audio controls className="audio-player">
-                  <source src={preview_url} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              ) : (
-                <h4>No preview available</h4>
-              )}
-            </div>
-          </div>
-
-          <div className="sepre"></div>
-          <div className="song-info-recommend">
-            <h2>Songs You Might Like</h2>
-            <div className="recommended-songs">
-              {loading ? (
-                <div id="songs-loading">
-                  <FontAwesomeIcon
-                    icon="fa-solid fa-hourglass-half"
-                    className="fa-solid fa-hourglass-half songs-loading-spinner"
-                  />
+          ) : recommendedSongs.length > 0 ? (
+            recommendedSongs.map((track) => (
+              <div
+                key={track.id}
+                className="recommended-song"
+                onClick={() => navigate("/song-info", { state: { song: track } })}
+              >
+                <img
+                  src={track.album.images[0]?.url}
+                  alt={`Album cover of ${track.album.name}`}
+                  className="recommended-song-img"
+                />
+                <div className="recommended-song-info">
+                  <h4>{track.name}</h4>
+                  <h5>
+                    {track.artists.map((artist) => artist.name).join(", ")}
+                  </h5>
                 </div>
-              ) : recommendedSongs.length > 0 ? (
-                recommendedSongs.map((track) => (
-                  <div
-                    key={track.id}
-                    className="recommended-song"
-                    onClick={() => handleRecommendationClick(track)}
-                  >
-                    <img
-                      src={track.album.images[0]?.url}
-                      alt={`Album cover of ${track.album.name}`}
-                      className="recommended-song-img"
-                    />
-                    <div className="recommended-song-info">
-                      <h4>{track.name}</h4>
-                      <h5>{track.artists.map((artist) => artist.name).join(", ")}</h5>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <h5>No recommendations available</h5>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+              </div>
+            ))
+          ) : (
+            <h5>No recommendations available</h5>
+          )}
+        </div>
+      </div>
     </section>
   );
 };

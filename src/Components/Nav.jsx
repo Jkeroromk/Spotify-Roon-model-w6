@@ -20,12 +20,14 @@ const Nav = () => {
     document.body.classList.add(savedTheme === "dark" ? "dark-theme" : "light-theme");
 
     const loggedIn = localStorage.getItem("loggedIn") === "true";
-    setIsLoggedIn(loggedIn);
+    const guestLoggedIn = localStorage.getItem("guestLoggedIn") === "true"; // Check for guest login
+    setIsLoggedIn(loggedIn || guestLoggedIn); // Update state based on both flags
 
     // Listen for changes in localStorage to update the login state
     const handleStorageChange = () => {
       const loggedIn = localStorage.getItem("loggedIn") === "true";
-      setIsLoggedIn(loggedIn);
+      const guestLoggedIn = localStorage.getItem("guestLoggedIn") === "true";
+      setIsLoggedIn(loggedIn || guestLoggedIn);
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -86,8 +88,25 @@ const Nav = () => {
 
   const handleLogout = () => {
     localStorage.setItem("loggedIn", "false"); // Set loggedIn flag to false
+    localStorage.setItem("guestLoggedIn", "false"); // Set guestLoggedIn flag to false
     setIsLoggedIn(false); // Update the state to reflect logged out status
     navigate("/"); // Redirect to login page
+  };
+
+  const handleGuestLogin = () => {
+    const guestCredentials = {
+      email: "123@gmail.com",
+      password: "123456",
+    };
+
+    console.log("Logging in as guest with:", guestCredentials);
+    alert("You are now logged in as a guest!");
+
+    // Set guest login flag in localStorage
+    localStorage.setItem("guestLoggedIn", "true");
+    localStorage.setItem("loggedIn", "false"); // Optionally reset loggedIn flag to false for regular users
+    navigate("/"); // Redirect to home page after guest login
+    window.location.reload(); // Ensure proper state update after reload
   };
 
   function openMenu() {
@@ -99,73 +118,76 @@ const Nav = () => {
   }
 
   return (
-    <>
-      <section id="Landing-page">
-        <nav>
-          <figure>
-            <a href="/"><FontAwesomeIcon icon="fa-brands fa-spotify" className="spotify-logo" /></a>
-          </figure>
-          <ul className="nav-links-list">
-            <li className="nav-link">
-              <button onClick={toggleAudio} className="chart-icon-btn">
-                <FontAwesomeIcon
-                  icon="fa-solid fa-chart-simple"
-                  className="chart-icon"
-                  beatFade={animate}
-                />
-              </button>
-            </li>
-            <li className="nav-link"><a href="/featuredsongs" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">Find Featured Songs</a></li>
-            {isLoggedIn ? (
-              <>
-                <li className="nav-link">
-                  <a href="/myplaylist" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">
-                    My Playlist
-                  </a>
-                </li>
-                <li className="nav-link">
-                  <button onClick={handleLogout} className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white log-out">
-                    Log Out
-                  </button>
-                </li>
-              </>
-            ) : (
+    <section id="Landing-page">
+      <nav>
+        <figure>
+          <a href="/"><FontAwesomeIcon icon="fa-brands fa-spotify" className="spotify-logo" /></a>
+        </figure>
+        <ul className="nav-links-list">
+          <li className="nav-link">
+            <button onClick={toggleAudio} className="chart-icon-btn">
+              <FontAwesomeIcon
+                icon="fa-solid fa-chart-simple"
+                className="chart-icon"
+                beatFade={animate}
+              />
+            </button>
+          </li>
+          <li className="nav-link"><a href="/featuredsongs" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">Find Featured Songs</a></li>
+          {isLoggedIn ? (
+            <>
+              <li className="nav-link">
+                <a href="/myplaylist" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">
+                  My Playlist
+                </a>
+              </li>
+              <li className="nav-link">
+                <button onClick={handleLogout} className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white log-out">
+                  Log Out
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
               <li className="nav-link">
                 <a href="/log-in" className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white">
                   Log in
                 </a>
               </li>
-            )}
-            <button className="btn_menu cursor-pointer" onClick={openMenu}><FontAwesomeIcon icon="fa-solid fa-caret-down" /></button>
-            <li className="nav-link"><button onClick={toggleTheme} className="theme-btn" ><FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin /></button></li>
-          </ul>
-        </nav>
-        <div>
-          <audio ref={audioRef} src={BGM} autoPlay muted></audio>
-        </div>
-        <div className="menu_backdrop">
-          <div className="menu_backdrop-container">
-            <button className="btn_menu btn_menu--close" onClick={CloseMenu}>
-              <FontAwesomeIcon icon="fa-solid fa-times" />
-            </button>
-            <ul className="menu_links">
-              <li className="menu_list"><a href="https://jkeroromk.github.io/Advance-portfolio/" className="menu_link" onClick={CloseMenu} >About</a></li>
-              <li className="menu_list"><a href="/featuredsongs" className="menu_link" onClick={CloseMenu}>Songs</a></li>
-              <li className="menu_list"><a href="https://jkeroromk.github.io/Advance-portfolio/" className="menu_link no-cursor" onClick={CloseMenu} >Contact</a></li>
-              {isLoggedIn ? (
-                <>
-                  <li className="menu_list"><a href="/myplaylist" className="menu_link" onClick={CloseMenu}>My Playlist</a></li>
-                  <li className="menu_list"><button onClick={handleLogout} className="menu_link log-out">Log Out</button></li>
-                </>
-              ) : (
+              {/* Add the Guest Login button */}
+            </>
+          )}
+          <button className="btn_menu cursor-pointer" onClick={openMenu}><FontAwesomeIcon icon="fa-solid fa-caret-down" /></button>
+          <li className="nav-link"><button onClick={toggleTheme} className="theme-btn" ><FontAwesomeIcon icon="fa-solid fa-circle-half-stroke" spin /></button></li>
+        </ul>
+      </nav>
+      <div>
+        <audio ref={audioRef} src={BGM} autoPlay muted></audio>
+      </div>
+      <div className="menu_backdrop">
+        <div className="menu_backdrop-container">
+          <button className="btn_menu btn_menu--close" onClick={CloseMenu}>
+            <FontAwesomeIcon icon="fa-solid fa-times" />
+          </button>
+          <ul className="menu_links">
+            <li className="menu_list"><a href="https://jkeroromk.github.io/Advance-portfolio/" className="menu_link" onClick={CloseMenu} >About</a></li>
+            <li className="menu_list"><a href="/featuredsongs" className="menu_link" onClick={CloseMenu}>Songs</a></li>
+            <li className="menu_list"><a href="https://jkeroromk.github.io/Advance-portfolio/" className="menu_link no-cursor" onClick={CloseMenu} >Contact</a></li>
+            {isLoggedIn ? (
+              <>
+                <li className="menu_list"><a href="/myplaylist" className="menu_link" onClick={CloseMenu}>My Playlist</a></li>
+                <li className="menu_list"><button onClick={handleLogout} className="menu_link log-out">Log Out</button></li>
+              </>
+            ) : (
+              <>
                 <li className="menu_list"><a href="/log-in" className="menu_link" onClick={CloseMenu}>Login</a></li>
-              )}
-              <li className="menu_list"><a href="#" className="menu_link no-cursor menu_signup" onClick={CloseMenu}>Sign Up</a></li>
-            </ul>
-          </div>
+              </>
+            )}
+            <li className="menu_list"><a href="#" className="menu_link no-cursor menu_signup" onClick={CloseMenu}>Sign Up</a></li>
+          </ul>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

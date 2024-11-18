@@ -13,15 +13,14 @@ const Songinfo = () => {
   const [recommendedSongs, setRecommendedSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSongClicked, setIsSongClicked] = useState(false);
-  const [numRecommendations, setNumRecommendations] = useState(5); // Default to 5
 
-  // Function to calculate the number of items per row
+  // Function to calculate the limit based on screen size
   const calculateLimit = () => {
     const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-    const itemHeight = 200; // Adjust this based on actual item height in pixels
-
-    // Calculate the number of items based on screen width
+    const itemHeight = 200; // Approximate item height (including gap)
+    const itemWidth = 250; // Approximate item width
+  
+    // Calculate items per row based on screen width
     const itemsPerRow =
       screenWidth > 1200
         ? 5
@@ -29,25 +28,16 @@ const Songinfo = () => {
         ? 4
         : screenWidth > 768
         ? 3
-        : 2; // Default to 2 for smaller screens
-
-    const visibleItems = Math.floor(screenHeight / itemHeight); // Number of visible items based on height
-
-    // Set the number of recommendations based on the screen width and height
-    setNumRecommendations(itemsPerRow * visibleItems);
+        : 2;
+  
+    // Maximum of 2 rows
+    const maxRows = 2;
+  
+    // Total items to fetch
+    return itemsPerRow * maxRows;
   };
+  
 
-  // Call calculateLimit on window resize
-  useEffect(() => {
-    calculateLimit(); // Call initially to set the number of recommendations
-    window.addEventListener("resize", calculateLimit); // Listen for resize events
-
-    return () => {
-      window.removeEventListener("resize", calculateLimit); // Cleanup on component unmount
-    };
-  }, []); // Only run once on mount
-
-  // Fetch recommended songs whenever song or numRecommendations changes
   useEffect(() => {
     if (!song) return;
 
@@ -55,31 +45,29 @@ const Songinfo = () => {
       try {
         setLoading(true);
 
-        // Get the access token
+        // Get access token
         const token = await getAccessToken();
         if (!token) {
           console.error("No access token available.");
           return;
         }
 
-        // Fetch recommended songs using the access token
-        const response = await axios.get(
-          "https://api.spotify.com/v1/recommendations",
-          {
-            params: {
-              seed_tracks: song.id,
-              limit: numRecommendations, // Use the dynamic limit
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        // Calculate limit based on screen size
+        const limit = calculateLimit();
 
-        // Filter out the current song from the recommended list
-        const filteredSongs = response.data.tracks.filter(
-          (track) => track.id !== song.id
-        );
+        // Fetch recommended songs using the access token
+        const response = await axios.get("https://api.spotify.com/v1/recommendations", {
+          params: {
+            seed_tracks: song.id,
+            limit, // Use the calculated limit
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Filter out the current song from the recommended songs
+        const filteredSongs = response.data.tracks.filter((track) => track.id !== song.id);
         setRecommendedSongs(filteredSongs);
         setLoading(false);
       } catch (error) {
@@ -88,8 +76,8 @@ const Songinfo = () => {
       }
     };
 
-    fetchRecommendedSongs(); // Call the function to fetch the recommendations
-  }, [song, numRecommendations]); // Dependencies: whenever the song or numRecommendations changes
+    fetchRecommendedSongs();
+  }, [song]);
 
   const handleBackClick = () => {
     navigate(-1);
@@ -109,6 +97,7 @@ const Songinfo = () => {
   }
 
   const { album, name, artists, duration_ms, preview_url } = song;
+
   const minutes = Math.floor(duration_ms / 60000);
   const seconds = ((duration_ms % 60000) / 1000).toFixed(0);
   const formattedDuration = `${minutes}:${seconds.padStart(2, "0")}`;
@@ -118,10 +107,7 @@ const Songinfo = () => {
       {isSongClicked && (
         <div className="spinner-container">
           <div id="songs-loading">
-            <FontAwesomeIcon
-              icon="fa-solid fa-hourglass-half"
-              className="songs-loading-spinner"
-            />
+            <FontAwesomeIcon icon="fa-solid fa-hourglass-half" className="songs-loading-spinner" />
           </div>
         </div>
       )}
@@ -165,7 +151,14 @@ const Songinfo = () => {
           <div className="song-info-recommend">
             <h2>Songs You Might Like</h2>
             <div className="recommended-songs">
-              {recommendedSongs.length > 0 ? (
+              {loading ? (
+                <div id="songs-loading">
+                  <FontAwesomeIcon
+                    icon="fa-solid fa-hourglass-half"
+                    className="fa-solid fa-hourglass-half songs-loading-spinner"
+                  />
+                </div>
+              ) : recommendedSongs.length > 0 ? (
                 recommendedSongs.map((track) => (
                   <div
                     key={track.id}
@@ -179,18 +172,12 @@ const Songinfo = () => {
                     />
                     <div className="recommended-song-info">
                       <h4>{track.name}</h4>
-                      <h5>
-                        {track.artists.map((artist) => artist.name).join(", ")}
-                      </h5>
+                      <h5>{track.artists.map((artist) => artist.name).join(", ")}</h5>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="error-prompt">
-                  <span className="error-message">
-                    ⚠️ No recommendations available
-                  </span>
-                </div>
+                <h5>No recommendations available</h5>
               )}
             </div>
           </div>

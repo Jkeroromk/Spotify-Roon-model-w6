@@ -1,181 +1,171 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import firebaseApp from "../firebase"; // Import the initialized Firebase app
+import "../index.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import getAccessToken from "../auth";
-import axios from "axios";
 
-const Songinfo = () => {
+const User = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isLogin, setIsLogin] = useState(true); // Default to "Log In"
   const navigate = useNavigate();
-  const location = useLocation();
-  const { song } = location.state || {}; // Get song info from the location state
 
-  const [recommendedSongs, setRecommendedSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isSongClicked, setIsSongClicked] = useState(false); // Track if a song is clicked
-  const [numRecommendations, setNumRecommendations] = useState(5); // Default to 5
+  const auth = getAuth(firebaseApp); // Use the initialized Firebase app
 
-  // Update recommendations count based on window width
-  const updateRecommendationsCount = () => {
-    const width = window.innerWidth;
-    if (width < 600) {
-      setNumRecommendations(4); // Very small screen, show 4 songs per row
-    } else if (width >= 600 && width < 900) {
-      setNumRecommendations(6); // Small screen, show 6 songs per row
-    } else if (width >= 900 && width < 1200) {
-      setNumRecommendations(8); // Medium screen, show 8 songs per row
+  // Check localStorage on component mount to set the login state
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("loggedIn");
+    if (loggedIn === "true") {
+      setIsLogin(true); // User is logged in
     } else {
-      setNumRecommendations(10); // Large screen, show 10 songs per row
+      setIsLogin(false); // User is not logged in
+    }
+  }, []);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      setLoading(false);
+      alert("Registration Successful!");
+      navigate("/"); // Redirect to the home page after successful registration
+    } catch (error) {
+      setLoading(false);
+      alert("Registration failed: " + error.message);
     }
   };
 
-  // Fetch recommended songs based on the current song
-  useEffect(() => {
-    updateRecommendationsCount(); // Update recommendations count on initial load
-    window.addEventListener("resize", updateRecommendationsCount); // Add resize event listener
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
 
-    if (!song) return;
+    try {
+      // Attempt to sign in with provided email and password
+      await signInWithEmailAndPassword(auth, email, password);
+      setLoading(false);
+      alert("Login Successful!");
+      localStorage.setItem("loggedIn", "true"); // Set loggedIn flag in localStorage
 
-    const fetchRecommendedSongs = async () => {
-      try {
-        setLoading(true); // Set loading to true
-        const token = await getAccessToken();
-        if (!token) {
-          console.error("No access token available.");
-          return;
-        }
+      navigate("/"); // Redirect to the home page
+    } catch (error) {
+      setLoading(false);
 
-        const response = await axios.get("https://api.spotify.com/v1/recommendations", {
-          params: {
-            seed_tracks: song.id, // Use the current song ID as a seed
-            limit: 20, // Fetch more songs than needed (we'll filter based on count)
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // Filter out the current song from the recommended songs
-        const filteredSongs = response.data.tracks.filter(track => track.id !== song.id);
-        setRecommendedSongs(filteredSongs);
-        setLoading(false); // Set loading to false after fetching
-      } catch (error) {
-        console.error("Error fetching recommended songs", error);
-        setLoading(false); // Set loading to false on error
+      // Handle specific errors
+      if (error.code === "auth/user-not-found") {
+        alert("You need to register first.");
+        navigate("/register"); // Redirect to the registration page
+      } else {
+        alert(error.code === "auth/wrong-password" ? "Incorrect password. Please try again." : `Login failed: ${error.message}`);
       }
-    };
-
-    fetchRecommendedSongs();
-
-    return () => {
-      window.removeEventListener("resize", updateRecommendationsCount); // Clean up event listener
-    };
-  }, [song]);
-
-  // Handle back navigation
-  const handleBackClick = () => {
-    navigate(-1); // Navigate back to the previous page
+    }
   };
 
-  // Handle song click for further details
-  const handleRecommendationClick = (selectedSong) => {
-    setIsSongClicked(true); // Set the song clicked state to true
-    setTimeout(() => {
-      navigate("/song-info", { state: { song: selectedSong } }); // Navigate to the song info page
-      setIsSongClicked(false); // Reset the clicked state after navigation
-    }, 1000); // Show a loading spinner for 1 second before navigating
+  const handleGuestLogin = () => {
+    const guestCredentials = {
+      email: "123@gmail.com",
+      password: "123456",
+    };
+
+    console.log("Logging in as guest with:", guestCredentials);
+    alert("You are now logged in as a guest!");
+    navigate("/"); // Redirect to home page after guest login
+    window.location.reload();
   };
-
-  if (!song) {
-    return <div>No song data available</div>;
-  }
-
-  const { album, name, artists, duration_ms, preview_url } = song;
-  const minutes = Math.floor(duration_ms / 60000);
-  const seconds = ((duration_ms % 60000) / 1000).toFixed(0);
-  const formattedDuration = `${minutes}:${seconds.padStart(2, "0")}`;
 
   return (
-    <section className="song-info-section">
-      {isSongClicked && (
-        <div className="spinner-container">
-          <div id="songs-loading">
-            <FontAwesomeIcon icon="fa-solid fa-hourglass-half" className="songs-loading-spinner" />
+    <>
+      {loading ? (
+        <div id="songs-loading">
+          <FontAwesomeIcon icon="fa-solid fa-hourglass-half" />
+        </div>
+      ) : (
+        <div className="search-container">
+          <div className="search-row">
+            <h1 className="search-title">
+              {isLogin ? "Welcome Back" : "Create an Account"}
+            </h1>
+            <h4 className="search-subtitle">
+              {isLogin ? "Please Enter the info Below" : "Fill in the details to sign up"}
+            </h4>
+            <form
+              className="user-form"
+              onSubmit={isLogin ? handleSubmit : handleRegister}
+            >
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                className="form-input"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <div className="input-container">
+                <input
+                  type={passwordVisible ? "text" : "password"}
+                  id="password"
+                  className="form-input"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="toggle-password-button"
+                >
+                  {passwordVisible ? "Hide" : "Show"}
+                </button>
+              </div>
+              <button type="submit" className="submit-button">
+                {isLogin ? "Log In" : "Sign Up"}
+              </button>
+            </form>
+
+            <div className="signup-section">
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)} // Toggle between Login and Sign Up
+                className="toggle-signup-button"
+              >
+                {isLogin
+                  ? "Don't have an account? Sign Up"
+                  : "Already have an account? Log In"}
+              </button>
+
+              <div className="guest-btn">
+                {!isLogin && (
+                  <button
+                    type="button"
+                    onClick={handleGuestLogin}
+                    className="toggle-signup-button"
+                  >
+                    Log in as Guest
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
-
-      {!isSongClicked && (
-        <>
-          <div className="song-info-header">
-            <button onClick={handleBackClick} className="song-info-back">
-              <FontAwesomeIcon icon={faArrowLeft} />
-              <h3>Back</h3>
-            </button>
-          </div>
-
-          <div className="song-info-container">
-            <div className="song-info-left-row">
-              <img
-                src={album.images[0]?.url}
-                alt={`Album cover of ${album.name}`}
-                className="song-info-img"
-              />
-            </div>
-
-            <div className="song-info-right-row">
-              <h2>{name}</h2>
-              <h4 className="artist">{artists[0]?.name}</h4>
-              <h4>Album: {album.name}</h4>
-              <h4>Duration: {formattedDuration}</h4>
-
-              {preview_url ? (
-                <audio controls className="audio-player">
-                  <source src={preview_url} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              ) : (
-                <h4>No preview available</h4>
-              )}
-            </div>
-          </div>
-
-          <div className="sepre"></div>
-          <div className="song-info-recommend">
-            <h2>Songs You Might Like</h2>
-            <div className="recommended-songs">
-              {loading ? (
-                <div id="songs-loading">
-                  <FontAwesomeIcon
-                    icon="fa-solid fa-hourglass-half"
-                    className="fa-solid fa-hourglass-half songs-loading-spinner"
-                  />
-                </div>
-              ) : (
-                recommendedSongs.slice(0, numRecommendations).map((track) => (
-                  <div
-                    key={track.id}
-                    className="recommended-song"
-                    onClick={() => handleRecommendationClick(track)}
-                  >
-                    <img
-                      src={track.album.images[0]?.url}
-                      alt={`Album cover of ${track.album.name}`}
-                      className="recommended-song-img"
-                    />
-                    <div className="recommended-song-info">
-                      <h4>{track.name}</h4> {/* Scrolling title */}
-                      <p>{track.artists.map(artist => artist.name).join(", ")}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </>
-      )}
-    </section>
+    </>
   );
 };
 
-export default Songinfo;
+export default User;

@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import BGM from "../assets/bgm.mp3";
 
 const Nav = () => {
@@ -111,9 +111,9 @@ const Nav = () => {
     <section id="Landing-page">
       <nav>
         <figure>
-          <a href="/">
+          <Link to="/">
             <FontAwesomeIcon icon="fa-brands fa-spotify" className="spotify-logo" />
-          </a>
+          </Link>
         </figure>
         <ul className="nav-links-list">
           <li className="nav-link">
@@ -126,40 +126,28 @@ const Nav = () => {
             </button>
           </li>
           <li className="nav-link">
-            <a
-              href="/featuredsongs"
-              className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white"
-            >
+            <Link to="/featuredsongs" className="nav-link-anchor">
               Find Featured Songs
-            </a>
+            </Link>
           </li>
           {isLoggedIn ? (
             <>
               <li className="nav-link">
-                <a
-                  href="/myplaylist"
-                  className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white"
-                >
+                <Link to="/myplaylist" className="nav-link-anchor">
                   My Playlist
-                </a>
+                </Link>
               </li>
               <li className="nav-link">
-                <button
-                  onClick={handleLogout}
-                  className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white log-out"
-                >
+                <button onClick={handleLogout} className="nav-link-anchor log-out">
                   Log Out
                 </button>
               </li>
             </>
           ) : (
             <li className="nav-link">
-              <a
-                href="/log-in"
-                className="nav-link-anchor link-hover-effect link-hover-effect-black link-hover-effect--white"
-              >
+              <Link to="/log-in" className="nav-link-anchor">
                 Log in
-              </a>
+              </Link>
             </li>
           )}
           <button className="btn_menu cursor-pointer" onClick={openMenu}>
@@ -182,57 +170,28 @@ const Nav = () => {
           </button>
           <ul className="menu_links">
             <li className="menu_list">
-              <a
-                href="https://jkeroromk.github.io/Advance-portfolio/"
-                className="menu_link"
-                onClick={closeMenu}
-              >
-                About
-              </a>
-            </li>
-            <li className="menu_list">
-              <a
-                href="/featuredsongs"
-                className="menu_link"
-                onClick={closeMenu}
-              >
+              <Link to="/featuredsongs" className="menu_link" onClick={closeMenu}>
                 Songs
-              </a>
-            </li>
-            <li className="menu_list">
-              <a
-                href="https://jkeroromk.github.io/Advance-portfolio/"
-                className="menu_link no-cursor"
-                onClick={closeMenu}
-              >
-                Contact
-              </a>
+              </Link>
             </li>
             {isLoggedIn ? (
               <>
                 <li className="menu_list">
-                  <a
-                    href="/myplaylist"
-                    className="menu_link"
-                    onClick={closeMenu}
-                  >
+                  <Link to="/myplaylist" className="menu_link" onClick={closeMenu}>
                     My Playlist
-                  </a>
+                  </Link>
                 </li>
                 <li className="menu_list">
-                  <button
-                    onClick={handleLogout}
-                    className="menu_link log-out"
-                  >
+                  <button onClick={handleLogout} className="menu_link log-out">
                     Log Out
                   </button>
                 </li>
               </>
             ) : (
               <li className="menu_list">
-                <a href="/log-in" className="menu_link" onClick={closeMenu}>
+                <Link to="/log-in" className="menu_link" onClick={closeMenu}>
                   Login
-                </a>
+                </Link>
               </li>
             )}
           </ul>
@@ -243,4 +202,3 @@ const Nav = () => {
 };
 
 export default Nav;
-

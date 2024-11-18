@@ -102,7 +102,11 @@ footer {
 .dark-theme .song-info-back,
 .dark-theme .songs-loading-spinner,
 .dark-theme .check-btn,
-.dark-theme .playlist-title{
+.dark-theme .playlist-title,
+.dark-theme .scrolling-title,
+.dark-theme .song-artist,
+.dark-theme .song-album,
+.dark-theme .song-duration{
   color: white;
 }
 
@@ -1233,15 +1237,177 @@ audio{
 
 
 
-.playlist-info{
-  display: flex;
-  flex-direction: column;
+/* PLAY LIST */
+
+/* Playlist Section Container */
+.playlist-section {
+  margin: 0 auto; /* Center the section horizontally */
+  padding: 20px;
 }
 
-.playlist-title,
-.playlist-duration{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 20px;
+/* Playlist Info (Header) */
+.playlist-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
+
+.playlist-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.playlist-duration {
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: #555; /* Muted text for contrast */
+}
+
+.sepre {
+  margin: 20px 0;
+  border-bottom: 2px solid #ddd;
+}
+
+/* Header and Row Grid Layout */
+.playlist-header,
+.playlist-row {
+  display: grid;
+  grid-template-columns: 0.15fr 2fr 1.5fr 2fr 0.7fr 0.1fr; /* Consistent grid for alignment */
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  text-align: left; /* Align text to the left */
+}
+
+/* Header Styles */
+.playlist-header {
+  font-weight: bold;
+  color: #888;
+  border-bottom: 2px solid #ddd;
+}
+
+.playlist-header span {
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+/* Row Styles */
+.playlist-row {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+/* Cover Image */
+.playlist-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* Text Columns */
+.scrolling-title,
+.song-artist,
+.song-album,
+.song-duration {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove Icon */
+.remove-icon {
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: #ff4d4f;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.remove-icon:hover {
+  transform: scale(1.3);
+  color: #e60000;
+}
+
+/* Empty Playlist Message */
+.empty-playlist-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 1.5rem;
+  color: #888;
+  text-align: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .playlist-header,
+  .playlist-row {
+    grid-template-columns: 0.2fr 1.5fr 1.2fr 1.5fr 0.5fr 0.1fr; /* Adjust grid for smaller screens */
+    gap: 5px; /* Reduce spacing */
+    padding: 8px 0;
+  }
+
+  .playlist-title {
+    font-size: 1.5rem; /* Adjust playlist title size */
+  }
+
+  .playlist-duration {
+    font-size: 1rem; /* Adjust duration text size */
+  }
+
+  .scrolling-title,
+  .song-artist,
+  .song-album,
+  .song-duration {
+    font-size: 0.9rem; /* Smaller text for compact layout */
+  }
+
+  .playlist-image {
+    width: 40px; /* Smaller image size */
+    height: 40px;
+  }
+
+  .remove-icon {
+    font-size: 1.2rem; /* Reduce icon size */
+  }
+}
+
+@media (max-width: 480px) {
+  .playlist-header,
+  .playlist-row {
+    grid-template-columns: 0.3fr 2fr 1fr; /* Stack cover and title, hide some details */
+    grid-template-areas:
+      "cover title remove"
+      "artist album duration"; /* Break into two rows */
+    gap: 5px;
+  }
+
+  .playlist-header span:nth-child(3),
+  .playlist-header span:nth-child(4),
+  .playlist-row .song-artist,
+  .playlist-row .song-album,
+  .playlist-row .song-duration {
+    display: none; /* Hide artist, album, and duration for compact screens */
+  }
+
+  .playlist-image {
+    width: 35px; /* Adjust for very small screens */
+    height: 35px;
+  }
+
+  .scrolling-title {
+    font-size: 0.85rem; /* Reduce title font size */
+  }
+
+  .remove-icon {
+    font-size: 1rem; /* Smaller icon for compact layout */
+  }
+}
+
+

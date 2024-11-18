@@ -8,35 +8,35 @@ import axios from "axios";
 const Songinfo = ({ song: propSong, playlist, onAddOrRemoveFromPlaylist }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Avoid redeclaring `song` by renaming it as `fetchedSong`
+
+
   const { song: fetchedSong } = location.state || {};
 
-  // Use `propSong` (from props) or `fetchedSong` (from location.state)
+
   const song = propSong || fetchedSong;
 
   const [recommendedSongs, setRecommendedSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [promptMessage, setPromptMessage] = useState(""); // For the prompt message
 
-  // Function to calculate the limit based on screen size
+
   const calculateLimit = () => {
     const screenWidth = window.innerWidth;
 
-    // Calculate items per row based on screen width
+
     const itemsPerRow =
       screenWidth > 1200
         ? 5
         : screenWidth > 992
-        ? 4
-        : screenWidth > 768
-        ? 3
-        : 2;
+          ? 4
+          : screenWidth > 768
+            ? 3
+            : 2;
 
-    // Maximum of 2 rows
+
     const maxRows = 2;
 
-    // Total items to fetch
+
     return itemsPerRow * maxRows;
   };
 
@@ -91,16 +91,19 @@ const Songinfo = ({ song: propSong, playlist, onAddOrRemoveFromPlaylist }) => {
   };
 
   const handleAddOrRemoveFromPlaylist = () => {
+    // Determine if the song is currently in the playlist
+    const isSongInPlaylist = playlist.some((item) => item.id === song.id);
+
     // Toggle the song in the playlist
     onAddOrRemoveFromPlaylist(song);
-  
-    // Show a prompt message after adding/removing
-    const message = playlist.some((item) => item.id === song.id)
-      ? "Added the song to the playlist"
-      : "Removed the song from the playlist";
-  
+
+    // Set the appropriate prompt message
+    const message = isSongInPlaylist
+      ? "Removed the song from the playlist"
+      : "Added the song to the playlist";
+
     setPromptMessage(message);
-  
+
     // Clear the prompt message after 2 seconds
     setTimeout(() => {
       setPromptMessage("");
@@ -166,6 +169,7 @@ const Songinfo = ({ song: propSong, playlist, onAddOrRemoveFromPlaylist }) => {
                 className="check-mark"
               />
             </button>
+
           </div>
         </div>
       </div>
@@ -196,16 +200,15 @@ const Songinfo = ({ song: propSong, playlist, onAddOrRemoveFromPlaylist }) => {
                 />
                 <div className="recommended-song-info">
                   <h4>{track.name}</h4>
-                  <h5>
-                    {track.artists.map((artist) => artist.name).join(", ")}
-                  </h5>
+                  <h5>{track.artists.map((artist) => artist.name).join(", ")}</h5>
                 </div>
               </div>
             ))
           ) : (
-            <h5>No recommendations available</h5>
+            <h5 className="default-playlist">No recommendations available</h5>
           )}
         </div>
+
       </div>
     </section>
   );

@@ -19,10 +19,10 @@ const SearchSongs = () => {
   const navigate = useNavigate();
 
   const handleSongClick = (song) => {
-    navigate("/song-info", { state: { song } }); // Pass song data to the next page
+    navigate("/song-info", { state: { song } }); 
   };
 
-  // Extract the search query from the URL using URLSearchParams
+  
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get("search");

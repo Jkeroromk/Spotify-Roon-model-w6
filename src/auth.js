@@ -1,5 +1,5 @@
-const clientId = "a544024e11ee4fc986b3be4af74277b0";
-const clientSecret = "86049c274310417c848a50f728e5d974";
+const clientId = "00f202463b524a7f8ab1137435e610e6";
+const clientSecret = "21297eef120e44d9ac7fd8b947eb9edb";
 
 // Utility function to introduce a delay between retries
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));

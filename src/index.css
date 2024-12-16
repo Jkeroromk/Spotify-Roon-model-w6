@@ -1242,6 +1242,7 @@ audio{
 /* Playlist Section Container */
 .playlist-section {
   margin: 0 auto; /* Center the section horizontally */
+  height: 70vh;
   padding: 20px;
 }
 

@@ -39,40 +39,57 @@ const FeaturedSongs = () => {
 
   // Function to fetch the songs based on sorting and pagination
   const fetchTopHits = async (accessToken, offset = 0) => {
-    const limit = calculateLimit(); // Use calculated limit
+  const limit = calculateLimit(); // Use calculated limit
 
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/browse/featured-playlists?limit=1`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch featured playlist");
-      const data = await response.json();
-      const playlistId = data.playlists.items[0].id;
-
-      const tracksResponse = await fetch(
-        `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
-      if (!tracksResponse.ok) throw new Error("Failed to fetch top hits");
-      const tracksData = await tracksResponse.json();
-      const allTracks = tracksData.items.map((item) => item.track);
-      const totalTracks = tracksData.total;
-
-      if (!allTracks.length) throw new Error("No songs retrieved");
-      return { songs: allTracks, total: totalTracks };
-    } catch (error) {
-      console.error("Error fetching top hits:", error);
-      setError("An error occurred while fetching featured songs.");
-      return { songs: [], total: 0 };
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/browse/featured-playlists?limit=1`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    
+    if (!response.ok) {
+      // Check if the token might be expired
+      if (response.status === 401) {
+        console.log("Token expired. Attempting to get a new token.");
+        const newAccessToken = await getAccessToken();
+        // Retry the request with the new token
+        return fetchTopHits(newAccessToken, offset);
+      }
+      throw new Error("Failed to fetch featured playlist");
     }
-  };
+
+    const data = await response.json();
+    console.log("Featured Playlist Response:", data); // Log the response
+
+    const playlistId = data.playlists.items[0]?.id;
+    if (!playlistId) {
+      throw new Error("No playlist found in the response");
+    }
+
+    const tracksResponse = await fetch(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    if (!tracksResponse.ok) throw new Error("Failed to fetch top hits");
+    const tracksData = await tracksResponse.json();
+    const allTracks = tracksData.items.map((item) => item.track);
+    const totalTracks = tracksData.total;
+
+    if (!allTracks.length) throw new Error("No songs retrieved");
+    return { songs: allTracks, total: totalTracks };
+  } catch (error) {
+    console.error("Error fetching top hits:", error);
+    setError("An error occurred while fetching featured songs.");
+    return { songs: [], total: 0 };
+  }
+};
 
   // Function to sort songs based on the selected criteria
   const sortSongs = (songs, criteria) => {

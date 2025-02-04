@@ -42,33 +42,28 @@ const FeaturedSongs = () => {
   const limit = calculateLimit(); // Use calculated limit
 
   try {
+    // Corrected endpoint for featured playlists
     const response = await fetch(
-      `https://api.spotify.com/v1/browse/featured-playlists?limit=1`,
+      `https://api.spotify.com/v1/browse/featured-playlists`,
       {
         method: "GET",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
       }
     );
-    
-    if (!response.ok) {
-      // Check if the token might be expired
-      if (response.status === 401) {
-        console.log("Token expired. Attempting to get a new token.");
-        const newAccessToken = await getAccessToken();
-        // Retry the request with the new token
-        return fetchTopHits(newAccessToken, offset);
-      }
-      throw new Error("Failed to fetch featured playlist");
-    }
+
+    // If request failed, log an error message
+    if (!response.ok) throw new Error("Failed to fetch featured playlist");
 
     const data = await response.json();
-    console.log("Featured Playlist Response:", data); // Log the response
+    console.log("Featured Playlist Response:", data); // Log response
 
-    const playlistId = data.playlists.items[0]?.id;
-    if (!playlistId) {
-      throw new Error("No playlist found in the response");
-    }
+    const playlistId = data.playlists.items[0]?.id;  // Extract playlistId from response
+    if (!playlistId) throw new Error("No playlist found in the response");
 
+    // Fetch tracks for the specific playlist
     const tracksResponse = await fetch(
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`,
       {
@@ -83,6 +78,7 @@ const FeaturedSongs = () => {
     const totalTracks = tracksData.total;
 
     if (!allTracks.length) throw new Error("No songs retrieved");
+
     return { songs: allTracks, total: totalTracks };
   } catch (error) {
     console.error("Error fetching top hits:", error);
@@ -90,6 +86,7 @@ const FeaturedSongs = () => {
     return { songs: [], total: 0 };
   }
 };
+
 
   // Function to sort songs based on the selected criteria
   const sortSongs = (songs, criteria) => {
